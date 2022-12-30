@@ -34,8 +34,10 @@ func main() {
 func initGin() {
 	r := gin.Default()
 	r.Use(cors.Default())
+
 	r.GET("/", handler.Root)
 	r.POST("/expenses", handler.Create)
+	r.GET("/expenses/:id", handler.Read)
 
 	srv := &http.Server{
 		Addr:           port,

@@ -50,6 +50,26 @@ func TestCreateData(t *testing.T) {
 	assert.Greater(t, id, 0)
 }
 
+func TestReadOneData(t *testing.T) {
+	var result database.Expense
+
+	err := request(http.MethodGet, uri("expenses", "1"), nil).Decode(&result)
+	if err != nil {
+		t.Fatal("Can not read expenses", err)
+	}
+
+	assert.EqualValues(t, 200, http.StatusOK)
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+
+	assert.NotEqualValues(t, "", result.Title)
+	assert.NotEqualValues(t, "", result.Amount)
+	assert.NotEqualValues(t, "", result.Note)
+	assert.NotEqualValues(t, "", result.Tags)
+
+	assert.Greater(t, len(result.Tags), 0, "Len > 0")
+}
+
 func (rcv *Response) Decode(v interface{}) error {
 	if rcv.err != nil {
 		return rcv.err
