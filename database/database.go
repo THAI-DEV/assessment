@@ -3,16 +3,27 @@ package database
 import (
 	"database/sql"
 	"log"
+	"os"
 
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 )
 
-func CreateTable(dbUrl string) {
-	db, err := sql.Open("postgres", dbUrl)
-	if err != nil {
-		log.Fatal("Connect ro database error", err)
-	}
+type Expense struct {
+	Id     string   `json:"id"`
+	Title  string   `json:"title"`
+	Amount float64  `json:"amount"`
+	Note   string   `json:"note"`
+	Tags   []string `json:"tags"`
+}
 
+var dbUrl string
+
+func init() {
+	dbUrl = os.Getenv("DATABASE_URL")
+}
+
+func CreateTable() {
+	db := openDB()
 	defer db.Close()
 
 	createTb := `CREATE TABLE IF NOT EXISTS expenses (
@@ -23,10 +34,38 @@ func CreateTable(dbUrl string) {
 					tags TEXT[]
 				);`
 
-	_, err = db.Exec(createTb)
+	_, err := db.Exec(createTb)
 	if err != nil {
-		log.Fatal("can't create table", err)
+		log.Fatal("Can't create table", err)
 	}
 
-	log.Println("create table success")
+	log.Println("Create table success")
+}
+
+func CreateData(input Expense) (int, error) {
+	db := openDB()
+	defer db.Close()
+
+	row := db.QueryRow("INSERT INTO expenses (title, amount, note , tags) values ($1, $2 , $3 , $4) RETURNING id",
+		input.Title, input.Amount, input.Note, pq.Array(input.Tags))
+	var id int
+
+	err := row.Scan(&id)
+	if err != nil {
+		log.Println("Can't scan id", err)
+		return -1, err
+	}
+
+	log.Println("Insert success id : ", id)
+
+	return id, nil
+}
+
+func openDB() *sql.DB {
+	db, err := sql.Open("postgres", dbUrl)
+	if err != nil {
+		log.Fatal("Connect ro database error", err)
+	}
+
+	return db
 }
