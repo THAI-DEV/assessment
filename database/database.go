@@ -61,6 +61,26 @@ func CreateData(input Expense) (int, error) {
 	return id, nil
 }
 
+func ReadData(id int) (Expense, error) {
+	db := openDB()
+	defer db.Close()
+
+	result := Expense{}
+
+	stmt, err := db.Prepare("SELECT id,	title, amount, note, tags  FROM expenses where id=$1")
+	if err != nil {
+		return result, err
+	}
+
+	row := stmt.QueryRow(id)
+	err = row.Scan(&result.Id, &result.Title, &result.Amount, &result.Note, pq.Array(&result.Tags))
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
 func openDB() *sql.DB {
 	db, err := sql.Open("postgres", dbUrl)
 	if err != nil {
