@@ -16,17 +16,18 @@ import (
 )
 
 var port string
-var dbUrl string
+
+// var dbUrl string
 
 func init() {
 	port = os.Getenv("PORT")
-	dbUrl = os.Getenv("DATABASE_URL")
+	// dbUrl = os.Getenv("DATABASE_URL")
 }
 
 func main() {
 	// fmt.Println("Please use server.go for main file")
 	// fmt.Println("start at port:", os.Getenv("PORT"))
-	database.CreateTable(dbUrl)
+	database.CreateTable()
 	initGin()
 }
 
@@ -34,6 +35,7 @@ func initGin() {
 	r := gin.Default()
 	r.Use(cors.Default())
 	r.GET("/", handler.Root)
+	r.POST("/expenses", handler.Create)
 
 	srv := &http.Server{
 		Addr:           port,
