@@ -9,20 +9,24 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/THAI-DEV/assessment/database"
 	"github.com/THAI-DEV/assessment/handler"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 var port string
+var dbUrl string
 
 func init() {
 	port = os.Getenv("PORT")
+	dbUrl = os.Getenv("DATABASE_URL")
 }
 
 func main() {
 	// fmt.Println("Please use server.go for main file")
 	// fmt.Println("start at port:", os.Getenv("PORT"))
+	database.CreateTable(dbUrl)
 	initGin()
 }
 
