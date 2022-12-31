@@ -103,6 +103,37 @@ func ReadData(id int) (Expense, error) {
 	return result, nil
 }
 
+func ReadAllData() ([]Expense, error) {
+	db := openDB()
+	defer db.Close()
+
+	result := []Expense{}
+
+	stmt, err := db.Prepare("SELECT id,	title, amount, note, tags  FROM expenses")
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := stmt.Query()
+	if err != nil {
+		log.Println("Can't query all expenses", err)
+		return nil, err
+	}
+
+	for rows.Next() {
+		output := Expense{}
+
+		err := rows.Scan(&output.Id, &output.Title, &output.Amount, &output.Note, pq.Array(&output.Tags))
+		if err != nil {
+			log.Fatal("can't Scan row into variable", err)
+		}
+
+		result = append(result, output)
+	}
+
+	return result, nil
+}
+
 func openDB() *sql.DB {
 	db, err := sql.Open("postgres", dbUrl)
 	if err != nil {
