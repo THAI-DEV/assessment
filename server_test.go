@@ -32,12 +32,14 @@ func TestCreateData(t *testing.T) {
 	body := bytes.NewBufferString(str)
 	json.Unmarshal([]byte(str), &inputJson)
 
-	err := request(http.MethodPost, uri("expenses"), body).Decode(&result)
+	res := request(http.MethodPost, uri("expenses"), body)
+
+	err := res.Decode(&result)
 	if err != nil {
 		t.Fatal("Can not create expense", err)
 	}
 
-	assert.EqualValues(t, 201, http.StatusCreated)
+	assert.EqualValues(t, http.StatusCreated, res.StatusCode)
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
@@ -50,15 +52,17 @@ func TestCreateData(t *testing.T) {
 	assert.Greater(t, id, 0)
 }
 
-func TestReadOneData(t *testing.T) {
+func TestReadOneDataCaseFound(t *testing.T) {
 	var result database.Expense
 
-	err := request(http.MethodGet, uri("expenses", "1"), nil).Decode(&result)
+	res := request(http.MethodGet, uri("expenses", "1"), nil)
+
+	err := res.Decode(&result)
 	if err != nil {
 		t.Fatal("Can not read expenses", err)
 	}
 
-	assert.EqualValues(t, 200, http.StatusOK)
+	assert.EqualValues(t, http.StatusOK, res.StatusCode)
 	assert.Nil(t, err)
 	assert.NotNil(t, result)
 
@@ -68,6 +72,11 @@ func TestReadOneData(t *testing.T) {
 	assert.NotEqualValues(t, "", result.Tags)
 
 	assert.Greater(t, len(result.Tags), 0, "Len > 0")
+}
+
+func TestReadOneDataCaseNotFound(t *testing.T) {
+	res := request(http.MethodGet, uri("expenses", "0"), nil)
+	assert.EqualValues(t, http.StatusBadRequest, res.StatusCode)
 }
 
 func (rcv *Response) Decode(v interface{}) error {
