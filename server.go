@@ -36,6 +36,8 @@ func initGin() {
 	r.Use(cors.Default())
 
 	r.GET("/", handler.Root)
+
+	r.Use(handler.AuthMiddleware())
 	r.POST("/expenses", handler.Create)
 	r.GET("/expenses/:id", handler.Read)
 	r.PUT("/expenses/:id", handler.Update)
