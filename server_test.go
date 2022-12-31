@@ -88,13 +88,50 @@ func (rcv *Response) Decode(v interface{}) error {
 	return json.NewDecoder(rcv.Body).Decode(v)
 }
 
-func TestUpdateData(t *testing.T) {
+func TestUpdateDataCaseNoId(t *testing.T) {
 	var result database.Expense
 	var inputJson handler.ExpenseBody
 
 	idParam := "2"
 
 	str := `{
+		"title": "apple smoothie",
+		"amount": 89,
+		"note": "no discount",
+		"tags": ["beverage"]
+	}`
+
+	body := bytes.NewBufferString(str)
+	json.Unmarshal([]byte(str), &inputJson)
+
+	res := request(http.MethodPut, uri("expenses", idParam), body)
+
+	err := res.Decode(&result)
+	if err != nil {
+		t.Fatal("Can not create expense", err)
+	}
+
+	assert.EqualValues(t, http.StatusOK, res.StatusCode)
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+
+	assert.EqualValues(t, inputJson.Title, result.Title)
+	assert.EqualValues(t, inputJson.Amount, result.Amount)
+	assert.EqualValues(t, inputJson.Note, result.Note)
+	assert.EqualValues(t, inputJson.Tags, result.Tags)
+
+	id, _ := strconv.Atoi(result.Id)
+	assert.Greater(t, id, 0)
+}
+
+func TestUpdateDataCaseId(t *testing.T) {
+	var result database.Expense
+	var inputJson handler.ExpenseBody
+
+	idParam := "2"
+
+	str := `{
+		"id": 0,
 		"title": "apple smoothie",
 		"amount": 89,
 		"note": "no discount",
