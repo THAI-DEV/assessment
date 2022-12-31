@@ -2,8 +2,10 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/lib/pq"
 )
@@ -58,6 +60,26 @@ func CreateData(input Expense) (int, error) {
 
 	log.Println("Insert success id : ", id)
 
+	return id, nil
+}
+
+func UpdateData(input Expense) (int, error) {
+	db := openDB()
+	defer db.Close()
+
+	stmt, err := db.Prepare("UPDATE expenses SET title=$2, amount=$3, note=$4 , tags=$5 WHERE id=$1")
+	if err != nil {
+		log.Println("Can't prepare statment update", err)
+	}
+
+	if _, err := stmt.Exec(input.Id, input.Title, input.Amount, input.Note, pq.Array(input.Tags)); err != nil {
+		log.Panicln("Error execute update ", err)
+		return -1, err
+	}
+
+	fmt.Println("Update success id : ", input.Id)
+
+	id, _ := strconv.Atoi(input.Id)
 	return id, nil
 }
 

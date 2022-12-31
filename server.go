@@ -38,6 +38,7 @@ func initGin() {
 	r.GET("/", handler.Root)
 	r.POST("/expenses", handler.Create)
 	r.GET("/expenses/:id", handler.Read)
+	r.PUT("/expenses/:id", handler.Update)
 
 	srv := &http.Server{
 		Addr:           port,
