@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type expenseBody struct {
+type ExpenseBody struct {
 	Title  string   `json:"title"`
 	Amount float64  `json:"amount"`
 	Note   string   `json:"note"`
@@ -57,7 +57,7 @@ func Update(c *gin.Context) {
 	idParam := c.Param("id")
 	// iid, _ := strconv.Atoi(idParam)
 
-	var expenseBody expenseBody
+	var expenseBody ExpenseBody
 
 	err := c.ShouldBindJSON(&expenseBody)
 	if err != nil {
