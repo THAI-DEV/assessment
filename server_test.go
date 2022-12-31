@@ -161,6 +161,23 @@ func TestUpdateDataCaseId(t *testing.T) {
 	assert.Greater(t, id, 0)
 }
 
+func TestReadAll(t *testing.T) {
+	var result []database.Expense
+
+	res := request(http.MethodGet, uri("expenses"), nil)
+
+	err := res.Decode(&result)
+	if err != nil {
+		t.Fatal("Can not read all expenses", err)
+	}
+
+	assert.EqualValues(t, http.StatusOK, res.StatusCode)
+	assert.Nil(t, err)
+	assert.NotNil(t, result)
+
+	assert.GreaterOrEqual(t, len(result), 1, "Len >= 1")
+}
+
 func request(method, url string, body io.Reader) *Response {
 	req, _ := http.NewRequest(method, url, body)
 

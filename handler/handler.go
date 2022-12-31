@@ -85,3 +85,13 @@ func Update(c *gin.Context) {
 
 	c.JSON(http.StatusOK, expense)
 }
+
+func ReadAll(c *gin.Context) {
+	result, err := database.ReadAllData()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, result)
+}
