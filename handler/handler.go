@@ -95,3 +95,27 @@ func ReadAll(c *gin.Context) {
 
 	c.JSON(http.StatusOK, result)
 }
+
+func AuthMiddleware() func(c *gin.Context) {
+	return func(c *gin.Context) {
+		authHeader := c.Request.Header.Get("Authorization")
+
+		if authHeader == "" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Request header authorization is empty",
+			})
+			c.Abort()
+			return
+		}
+
+		if authHeader != "November 10, 2009" {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorization",
+			})
+			c.Abort()
+			return
+		}
+
+		c.Next() // Subsequent processing functions can use c.Get("username") to obtain the currently requested user information
+	}
+}
