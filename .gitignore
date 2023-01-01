@@ -2,3 +2,4 @@ rest-client
 
 *.bat
 Note.txt
+env_file
