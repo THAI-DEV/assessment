@@ -1,0 +1,19 @@
+version: "3.6"
+
+services:
+  my-app:
+    container_name: my-assessment
+    image: my/assessment:golang
+    # restart: "always"
+
+    ports:
+      - "2565:2565"
+    environment:
+      - TZ=Asia/Bangkok
+      - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL}
+
+
+#### RUN Docker Compose
+# docker-compose up -d
+# docker exec -ti my-assessment sh

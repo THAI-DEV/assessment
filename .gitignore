@@ -1,4 +1,8 @@
+# Folder
 rest-client
 
+# File
 *.bat
 Note.txt
+env_file
+.env
