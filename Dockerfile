@@ -21,12 +21,13 @@ RUN go build -o ./build/server .
 
 FROM alpine:3.17
 
+RUN apk update && \
+    apk add --no-cache tzdata
+
 COPY --from=build-base /app/build/server /app/server
 
 CMD ["/app/server"]
 
-
 #### RUN Docker
 #    docker build -t my/assessment:golang .
-
 #    docker run --env-file=env_file --name my_app_expense -p 2565:2565 -it my/assessment:golang
