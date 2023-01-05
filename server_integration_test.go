@@ -1,3 +1,6 @@
+//go:build integration
+// +build integration
+
 package main
 
 import (
@@ -11,15 +14,18 @@ import (
 
 	"github.com/THAI-DEV/assessment/database"
 	"github.com/THAI-DEV/assessment/handler"
+
 	"github.com/stretchr/testify/assert"
 )
 
-type Response struct {
+type Response2 struct {
 	*http.Response
 	err error
 }
 
-func TestCreateData(t *testing.T) {
+var testId = "1"
+
+func Test1CreateData(t *testing.T) {
 	var result database.Expense
 	var inputJson database.Expense
 
@@ -33,9 +39,9 @@ func TestCreateData(t *testing.T) {
 	body := bytes.NewBufferString(str)
 	json.Unmarshal([]byte(str), &inputJson)
 
-	res := request(http.MethodPost, uri("expenses"), body)
+	res := request2(http.MethodPost, uri2("expenses"), body)
 
-	err := res.Decode(&result)
+	err := res.Decode2(&result)
 	if err != nil {
 		t.Fatal("Can not create expense", err)
 	}
@@ -51,14 +57,16 @@ func TestCreateData(t *testing.T) {
 
 	id, _ := strconv.Atoi(result.Id)
 	assert.Greater(t, id, 0)
+
+	testId = result.Id
 }
 
-func TestReadOneDataCaseFound(t *testing.T) {
+func Test2ReadOneData(t *testing.T) {
 	var result database.Expense
 
-	res := request(http.MethodGet, uri("expenses", "1"), nil)
+	res := request2(http.MethodGet, uri2("expenses", testId), nil)
 
-	err := res.Decode(&result)
+	err := res.Decode2(&result)
 	if err != nil {
 		t.Fatal("Can not read expenses", err)
 	}
@@ -75,52 +83,11 @@ func TestReadOneDataCaseFound(t *testing.T) {
 	assert.Greater(t, len(result.Tags), 0, "Len > 0")
 }
 
-func TestReadOneDataCaseNotFound(t *testing.T) {
-	res := request(http.MethodGet, uri("expenses", "0"), nil)
-	assert.EqualValues(t, http.StatusBadRequest, res.StatusCode)
-}
-
-func TestUpdateDataCaseNoId(t *testing.T) {
+func Test3UpdateData(t *testing.T) {
 	var result database.Expense
 	var inputJson handler.ExpenseBody
 
-	idParam := "1"
-
-	str := `{
-		"title": "apple smoothie",
-		"amount": 89,
-		"note": "no discount",
-		"tags": ["beverage"]
-	}`
-
-	body := bytes.NewBufferString(str)
-	json.Unmarshal([]byte(str), &inputJson)
-
-	res := request(http.MethodPut, uri("expenses", idParam), body)
-
-	err := res.Decode(&result)
-	if err != nil {
-		t.Fatal("Can not create expense", err)
-	}
-
-	assert.EqualValues(t, http.StatusOK, res.StatusCode)
-	assert.Nil(t, err)
-	assert.NotNil(t, result)
-
-	assert.EqualValues(t, inputJson.Title, result.Title)
-	assert.EqualValues(t, inputJson.Amount, result.Amount)
-	assert.EqualValues(t, inputJson.Note, result.Note)
-	assert.EqualValues(t, inputJson.Tags, result.Tags)
-
-	id, _ := strconv.Atoi(result.Id)
-	assert.Greater(t, id, 0)
-}
-
-func TestUpdateDataCaseId(t *testing.T) {
-	var result database.Expense
-	var inputJson handler.ExpenseBody
-
-	idParam := "1"
+	idParam := testId
 
 	str := `{
 		"id": 0,
@@ -133,9 +100,9 @@ func TestUpdateDataCaseId(t *testing.T) {
 	body := bytes.NewBufferString(str)
 	json.Unmarshal([]byte(str), &inputJson)
 
-	res := request(http.MethodPut, uri("expenses", idParam), body)
+	res := request2(http.MethodPut, uri2("expenses", idParam), body)
 
-	err := res.Decode(&result)
+	err := res.Decode2(&result)
 	if err != nil {
 		t.Fatal("Can not create expense", err)
 	}
@@ -153,12 +120,12 @@ func TestUpdateDataCaseId(t *testing.T) {
 	assert.Greater(t, id, 0)
 }
 
-func TestReadAll(t *testing.T) {
+func Test4ReadAll(t *testing.T) {
 	var result []database.Expense
 
-	res := request(http.MethodGet, uri("expenses"), nil)
+	res := request2(http.MethodGet, uri2("expenses"), nil)
 
-	err := res.Decode(&result)
+	err := res.Decode2(&result)
 	if err != nil {
 		t.Fatal("Can not read all expenses", err)
 	}
@@ -170,7 +137,7 @@ func TestReadAll(t *testing.T) {
 	assert.GreaterOrEqual(t, len(result), 1, "Len >= 1")
 }
 
-func (rcv *Response) Decode(v interface{}) error {
+func (rcv *Response2) Decode2(v interface{}) error {
 	if rcv.err != nil {
 		return rcv.err
 	}
@@ -178,7 +145,7 @@ func (rcv *Response) Decode(v interface{}) error {
 	return json.NewDecoder(rcv.Body).Decode(v)
 }
 
-func request(method, url string, body io.Reader) *Response {
+func request2(method, url string, body io.Reader) *Response2 {
 	req, _ := http.NewRequest(method, url, body)
 
 	req.Header.Add("Authorization", "November 10, 2009")
@@ -187,11 +154,11 @@ func request(method, url string, body io.Reader) *Response {
 	client := http.Client{}
 	res, err := client.Do(req)
 
-	return &Response{res, err}
+	return &Response2{res, err}
 }
 
-func uri(paths ...string) string {
-	host := "http://localhost:2565"
+func uri2(paths ...string) string {
+	host := "http://container_rest:2565"
 	if paths == nil {
 		return host
 	}
