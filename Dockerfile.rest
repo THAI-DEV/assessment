@@ -1,0 +1,17 @@
+FROM golang:1.19.4-alpine3.17
+
+WORKDIR /app
+
+COPY ./database/ ./database/
+
+COPY ./handler/ ./handler/
+
+COPY *.go .
+
+COPY go.mod .
+
+RUN go get
+
+RUN go mod download
+
+CMD go run server.go

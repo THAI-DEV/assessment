@@ -1,0 +1,21 @@
+FROM golang:1.19.4-alpine3.17
+
+WORKDIR /app
+
+COPY ./database/ ./database/
+
+COPY ./handler/ ./handler/
+
+COPY *.go .
+
+COPY go.mod .
+
+RUN go get
+
+RUN go get github.com/stretchr/testify/assert
+
+RUN go mod download
+
+RUN go mod tidy
+
+CMD CGO_ENABLED=0 go test --tags=integration server_integration_test.go
