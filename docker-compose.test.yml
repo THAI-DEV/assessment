@@ -1,0 +1,29 @@
+version: "3.6"
+
+services:
+  it_tests:
+    container_name: container_rest
+    build:
+      context: .
+      dockerfile: ./Dockerfile.test
+    depends_on:
+      - db
+    ports:
+      - "2565:2565"
+    environment:
+      - TZ=Asia/Bangkok
+      - PORT=:2565
+      - DATABASE_URL=host=container_db port=5432 user=postgres password=admin dbname=go-example-db sslmode=disable
+  db:
+    image: postgres:13.4
+    container_name: container_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: go-example-db
+    ports:
+      - "5432:5432"
+    restart: on-failure
+
+# Run Docker Compose   
+# docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from it_tests
