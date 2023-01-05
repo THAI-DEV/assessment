@@ -1,11 +1,11 @@
 version: "3.6"
 
 services:
-  it_tests:
+  rest:
     container_name: container_rest
     build:
       context: .
-      dockerfile: ./Dockerfile.test
+      dockerfile: ./Dockerfile.rest
     depends_on:
       - db
     ports:
@@ -24,6 +24,14 @@ services:
     ports:
       - "5432:5432"
     restart: on-failure
+  test:
+    container_name: container_test
+    build:
+      context: .
+      dockerfile: ./Dockerfile.test
+    depends_on:
+      - rest
+     
 
 # Run Docker Compose   
-# docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from it_tests
+# docker-compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from rest

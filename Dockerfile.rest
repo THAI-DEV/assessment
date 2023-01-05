@@ -12,10 +12,6 @@ COPY go.mod .
 
 RUN go get
 
-RUN go get github.com/stretchr/testify/assert
-
 RUN go mod download
 
-RUN go mod tidy
-
-CMD CGO_ENABLED=0 go test .
+CMD go run server.go
