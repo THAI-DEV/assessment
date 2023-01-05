@@ -92,7 +92,7 @@ func TestUpdateDataCaseNoId(t *testing.T) {
 	var result database.Expense
 	var inputJson handler.ExpenseBody
 
-	idParam := "2"
+	idParam := "1"
 
 	str := `{
 		"title": "apple smoothie",
@@ -128,7 +128,7 @@ func TestUpdateDataCaseId(t *testing.T) {
 	var result database.Expense
 	var inputJson handler.ExpenseBody
 
-	idParam := "2"
+	idParam := "1"
 
 	str := `{
 		"id": 0,
@@ -181,6 +181,7 @@ func TestReadAll(t *testing.T) {
 func request(method, url string, body io.Reader) *Response {
 	req, _ := http.NewRequest(method, url, body)
 
+	req.Header.Add("Authorization", "November 10, 2009")
 	req.Header.Add("Content-Type", "application/json")
 
 	client := http.Client{}
