@@ -28,7 +28,7 @@ func CreateTable() {
 	db := openDB()
 	defer db.Close()
 
-	createTb := `CREATE TABLE IF NOT EXISTS expenses (
+	createTb := `CREATE TABLE IF NOT EXISTS public.expenses (
 					id SERIAL PRIMARY KEY,
 					title TEXT,
 					amount FLOAT,
@@ -38,7 +38,7 @@ func CreateTable() {
 
 	_, err := db.Exec(createTb)
 	if err != nil {
-		log.Fatal("Can't create table", err)
+		log.Println("Can't create table", err)
 	}
 
 	log.Println("Create table success")
@@ -48,7 +48,7 @@ func CreateData(input Expense) (int, error) {
 	db := openDB()
 	defer db.Close()
 
-	row := db.QueryRow("INSERT INTO expenses (title, amount, note , tags) values ($1, $2 , $3 , $4) RETURNING id",
+	row := db.QueryRow("INSERT INTO public.expenses (title, amount, note , tags) values ($1, $2 , $3 , $4) RETURNING id",
 		input.Title, input.Amount, input.Note, pq.Array(input.Tags))
 	var id int
 
@@ -67,7 +67,7 @@ func UpdateData(input Expense) (int, error) {
 	db := openDB()
 	defer db.Close()
 
-	stmt, err := db.Prepare("UPDATE expenses SET title=$2, amount=$3, note=$4 , tags=$5 WHERE id=$1")
+	stmt, err := db.Prepare("UPDATE public.expenses SET title=$2, amount=$3, note=$4 , tags=$5 WHERE id=$1")
 	if err != nil {
 		log.Println("Can't prepare statment update", err)
 	}
@@ -89,7 +89,7 @@ func ReadData(id int) (Expense, error) {
 
 	result := Expense{}
 
-	stmt, err := db.Prepare("SELECT id,	title, amount, note, tags  FROM expenses where id=$1")
+	stmt, err := db.Prepare("SELECT id,	title, amount, note, tags  FROM public.expenses where id=$1")
 	if err != nil {
 		return result, err
 	}
@@ -109,7 +109,7 @@ func ReadAllData() ([]Expense, error) {
 
 	result := []Expense{}
 
-	stmt, err := db.Prepare("SELECT id,	title, amount, note, tags  FROM expenses")
+	stmt, err := db.Prepare("SELECT id,	title, amount, note, tags  FROM public.expenses")
 	if err != nil {
 		return nil, err
 	}
@@ -135,6 +135,7 @@ func ReadAllData() ([]Expense, error) {
 }
 
 func openDB() *sql.DB {
+	fmt.Println("Connect db : ", dbUrl)
 	db, err := sql.Open("postgres", dbUrl)
 	if err != nil {
 		log.Fatal("Connect ro database error", err)
