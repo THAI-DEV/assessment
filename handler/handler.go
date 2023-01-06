@@ -40,11 +40,11 @@ func Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, expense)
 }
 
-func Read(c *gin.Context) {
+func ReadOne(c *gin.Context) {
 	idParam := c.Param("id")
 	id, _ := strconv.Atoi(idParam)
 
-	result, err := database.ReadData(id)
+	result, err := database.ReadOneData(id)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"errors": err.Error()})
 		return
@@ -116,6 +116,6 @@ func AuthMiddleware() func(c *gin.Context) {
 			return
 		}
 
-		c.Next() // Subsequent processing functions can use c.Get("username") to obtain the currently requested user information
+		c.Next()
 	}
 }

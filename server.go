@@ -17,16 +17,11 @@ import (
 
 var port string
 
-// var dbUrl string
-
 func init() {
 	port = os.Getenv("PORT")
-	// dbUrl = os.Getenv("DATABASE_URL")
 }
 
 func main() {
-	// fmt.Println("Please use server.go for main file")
-	// fmt.Println("start at port:", os.Getenv("PORT"))
 	database.CreateTable()
 	initGin()
 }
@@ -39,7 +34,7 @@ func initGin() {
 
 	r.Use(handler.AuthMiddleware())
 	r.POST("/expenses", handler.Create)
-	r.GET("/expenses/:id", handler.Read)
+	r.GET("/expenses/:id", handler.ReadOne)
 	r.PUT("/expenses/:id", handler.Update)
 	r.GET("/expenses", handler.ReadAll)
 
@@ -52,7 +47,7 @@ func initGin() {
 	}
 
 	go func() {
-		log.Println("--- start at port:", port, "---")
+		log.Println("--- Start server at port:", port, "---")
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("listen: %s\n", err)
 		}
@@ -71,5 +66,5 @@ func initGin() {
 	}
 
 	<-ctx.Done()
-	log.Println("--- Server exiting ---")
+	log.Println("--- Server Exiting ---")
 }
