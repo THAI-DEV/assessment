@@ -83,7 +83,7 @@ func UpdateData(input Expense) (int, error) {
 	return id, nil
 }
 
-func ReadData(id int) (Expense, error) {
+func ReadOneData(id int) (Expense, error) {
 	db := openDB()
 	defer db.Close()
 
