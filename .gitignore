@@ -6,3 +6,4 @@ rest-client
 Note.txt
 env_file
 .env
+*.ps1
